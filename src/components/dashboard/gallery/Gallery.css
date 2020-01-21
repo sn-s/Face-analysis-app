@@ -1,0 +1,8 @@
+.thumbnail-box {
+  opacity: 0.5;
+}
+
+.thumbnail-box:hover {
+  opacity: 1.0;
+  transition: opacity .15s ease-in;
+}
