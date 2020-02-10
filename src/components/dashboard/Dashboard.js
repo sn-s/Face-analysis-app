@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./Dashboard.css";
+import  { Breakpoint } from 'react-socks';
 import Clarifai from "clarifai";
+import "./Dashboard.css";
+
 import DetectBox from "./detectBox/DetectBox";
-import InfoBox from "./infoBox/InfoBox";
+import Confidence from "./imageBox/confindence";
 import ImageBox from "./imageBox/ImageBox";
+import InfoBox from "./infoBox/InfoBox";
 import Gallery from "./gallery/Gallery";
 
 import firebase from "../../config/Config";
-
 import { connect } from "react-redux";
 import { getImages } from "../../redux/actions/imageActions";
 
@@ -237,31 +239,74 @@ const Dashboard = ({ getImages, thumbnails }) => {
 
       <Gallery thumbnails={thumbnails} getImageData={getImageData} />
 
+
       {errorMessage 
         ? 
         <div className="mb7 br3 mv3 ba b--white-50 w-70 shadow-5 center" >
           <p className="f3 mv5" >{errorMessage}</p>
         </div>
         :
-        <div className="mw8 center ph0-ns" >
-          <div className="fl w-50 pr4 pv5 " >
-              <ImageBox 
-                imageUrl={imageUrl} 
-                imageFile={imageFile}
-                multiBox={multiBox}
-                nameData={nameData}
-                getIdFromImage={getIdFromImage} />
-             
-          </div>
-          {(imageUrl || imageFile) && 
-          <div className="fl w-50 pl4 pv5" >
-            {genderData ? <InfoBox 
-              genderData={genderData} 
-              ageData={ageData} 
-              raceData={raceData} /> 
-              : <div className="lds-dual-ring"></div>}
+        <>
+        {(imageUrl || imageFile) && 
+          <div className="title-box" >
+            <Confidence />
+            <p>Hover above the box to reveal the name</p>
           </div>}
-        </div>}
+
+        <div className="flex center mw8">
+          <div className="image-box w-100 ma2 tc">
+            <ImageBox
+              imageUrl={imageUrl} 
+              imageFile={imageFile}
+              multiBox={multiBox}
+              nameData={nameData}
+              genderData={genderData}
+              ageData={ageData} 
+              raceData={raceData}
+              getIdFromImage={getIdFromImage}/>
+          </div>
+
+          
+            <div className="info-box w-70-ns w-auto w-auto-m ma2">
+              {(imageUrl || imageFile) &&
+                <div>
+                  {genderData ? 
+                    <Breakpoint customQuery="(min-width: 800px)" >
+                      <InfoBox
+                      genderData={genderData} 
+                      ageData={ageData} 
+                      raceData={raceData} />
+                    </Breakpoint>
+                    : <div className="lds-dual-ring">
+                      </div>}
+                </div>}
+            </div>
+          
+
+        </div>
+
+        </>
+
+        // <div className="mw8 center ph0-ns" >
+        //   <div className="image-box fl w-50-ns pr4 pv5" >
+        //       <ImageBox 
+        //         imageUrl={imageUrl} 
+        //         imageFile={imageFile}
+        //         multiBox={multiBox}
+        //         nameData={nameData}
+        //         getIdFromImage={getIdFromImage} />
+             
+        //   </div>
+        //   {(imageUrl || imageFile) && 
+        //   <div className="info-box fl w-50-ns pl4 pv5 fr" >
+        //     {genderData ? <InfoBox 
+        //       genderData={genderData} 
+        //       ageData={ageData} 
+        //       raceData={raceData} /> 
+        //       : <div className="lds-dual-ring"></div>}
+        //   </div>}
+        // </div>
+        }
 
     </div>
     )

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './App.css';
 import Particles from "react-particles-js";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BreakpointProvider } from "react-socks";
 
 import Navbar from "./components/layout/navbar/Navbar";
 import SignIn from "./components/auth/SignIn";
@@ -39,16 +40,18 @@ const App = ({ authCheck }) => {
 
   return (
     <BrowserRouter>
-      <div className="App">
-        <Navbar />
-        <Particles className="particles" params={particleOptions} />
-        <Switch>
-          <Route path="/" exact component={Dashboard} />
-          <Route path="/signin" component={SignIn} />
-          <Route path="/signup" component={SignUp} />
-          <Route path="/gallery" component={Gallery} />
-        </Switch>
-      </div>
+      <BreakpointProvider>
+        <div className="App">
+          <Navbar />
+          <Particles className="particles" params={particleOptions} />
+          <Switch>
+            <Route path="/" exact component={Dashboard} />
+            <Route path="/signin" component={SignIn} />
+            <Route path="/signup" component={SignUp} />
+            <Route path="/gallery" component={Gallery} />
+          </Switch>
+        </div>
+      </BreakpointProvider>
     </BrowserRouter>
     );
 };

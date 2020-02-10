@@ -37,16 +37,16 @@ const SignUp = ({ signUp, isUserSignedIn, signUpError }) => {
 
   return (
     <div>
-      <p className="f3 ma5">
+      <p className="f4 f3-ns mv5 ma3 ma5-ns">
         WHO-AM-I is powered by Clarifai, which uses a Visual Recognition AI to analyse images 
         and return data based on facial characteristics. Clarifai uses machine learning to train 
         models to recognise certain patterns in the images.
       </p> 
-      <article className="br3 ba b--white-50 mv4 w-100 w-50-m w-50-l mw6 shadow-5 center">  
+      <article className="w-100-ns w-75-m w-90 br3 ba b--white-50 mv4 w-50-l mw6 shadow-5 center">  
         <main className="pa4 white-80">
           <form className="measure" onSubmit={onFormSubmit} >
             <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
-              <legend className="f1 fw6 ph0 mh0">Register</legend> 
+              <legend className="f1 fw6 w-100 ph0 mh0">Register</legend> 
       
               <div className="mt3">
                 <label className="f4 db fw6 lh-copy" htmlFor="email-address">Email</label>
@@ -61,7 +61,7 @@ const SignUp = ({ signUp, isUserSignedIn, signUpError }) => {
               <div className="mv3">
                 <label className="f4 db fw6 lh-copy" htmlFor="password">Password</label>
                 <input 
-                  className="pa2 input-reset ba bg-white hover-bg-black hover-white w-100" 
+                  className="b pa2 input-reset ba bg-white hover-bg-black hover-white w-100" 
                   type="password" 
                   name="password"  
                   id="password"
@@ -71,8 +71,7 @@ const SignUp = ({ signUp, isUserSignedIn, signUpError }) => {
               <div className="mv3">
                 <label className="f4 db fw6 lh-copy" htmlFor="password2">Confirm Password</label>
                 <input 
-                  className="pa2 input-reset ba bg-white hover-bg-black hover-white" 
-                  style={{width: "425px"}}
+                  className="b pa2 input-reset ba bg-white hover-bg-black hover-white w-100" 
                   type="password" 
                   name="password2"  
                   id="password2"

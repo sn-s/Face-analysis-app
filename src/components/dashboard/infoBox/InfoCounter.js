@@ -8,7 +8,7 @@ const InfoCounter = ({ number }) => {
   }
 
   return (
-    <div className="f1 pa3" >
+    <div className="tc f2 f2-m f1-ns  pa3" >
       <CountUp end={checkAge()} duration={3} />
     </div>
   )

@@ -6,7 +6,9 @@ const InfoBox = ({ genderData, ageData, raceData, errorMessage }) => {
 
   
   return (
-    <div className="br3 ba b--white-50 w-100 shadow-5 center" >
+    <div 
+      className="info-style mt3 br3 ba b--white-50 w-100 shadow-5 center"
+    >
       {genderData ?
         <div>
           <InfoCard title="Gender" genderData={genderData} />

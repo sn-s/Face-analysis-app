@@ -50,3 +50,13 @@
   padding: 5px;
   opacity: 100;
 }
+
+.image-style {
+  position: absolute;
+}
+
+@media screen and (max-width: 500px) {
+  .image-style {
+    width: 100%;
+  }
+}

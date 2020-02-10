@@ -36,3 +36,10 @@ html {
     transform: rotate(360deg);
   }
 }
+
+
+/* @media screen and (max-width: 600px) {
+  .info-style {
+    margin-top: 300px;
+  }
+} */

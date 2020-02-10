@@ -1,10 +1,12 @@
 import React from "react";
+import  { Breakpoint } from 'react-socks';
+
 import './ImageBox.css';
-import Confidence from "./confindence";
+import MobileInfoBox from "../mobileInfoBox/MobileInfoBox";
 
 const paddingAdjustment = 15;
 
-const ImageBox = ({ imageUrl, multiBox, imageFile, nameData, getIdFromImage }) => {
+const ImageBox = ({ imageUrl, multiBox, imageFile, nameData, getIdFromImage, genderData, ageData, raceData }) => {
 
   const checkNameValue = (name) => {
     if(name.value > 0 && name.value <= 0.2) return "#ff4136"
@@ -33,12 +35,14 @@ const ImageBox = ({ imageUrl, multiBox, imageFile, nameData, getIdFromImage }) =
 
   return (
     <>
-      {(imageUrl || imageFile) && 
-      <div className="title-box" >
-        <Confidence />
-        <p>Hover above the box to reveal the name</p>
-      </div>}
-      <div className="absolute">
+      <Breakpoint customQuery="(max-width: 800px)" >
+        <MobileInfoBox
+          genderData={genderData}
+          ageData={ageData} 
+          raceData={raceData} 
+        />
+      </Breakpoint>
+      <div className="image-style">
       {(imageUrl || imageFile) && 
       <img
         className="image-box br3 ba b--white-50 shadow-5"
