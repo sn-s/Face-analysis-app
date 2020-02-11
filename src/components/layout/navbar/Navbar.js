@@ -12,7 +12,7 @@ const Navbar = ({ isUserSignedIn }) => {
 
   return (
     <nav className="dt ba b--white-50 bg-white-50 w-100 border-box shadow-5">
-      <a className="dtc link white w-35" href="/">
+      <a className="f3 dtc link white w-35" href="/">
         <h3 className="title yellow">Who-Am-I</h3>
       </a>
       <div className="dtc v-mid w-65 tr">{navLinks}</div>

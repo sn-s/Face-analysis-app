@@ -7,7 +7,7 @@ const SignedInLinks = ({ signOut }) => {
   return (
     <div>
       <a 
-        className="subtitle link white hover-red mr4 mr4-m mr6-ns" 
+        className="subtitle f4-ns link white hover-red mr4 mr4-m mr6-ns" 
         href="/"
         onClick={signOut} >Logout</a>
     </div>

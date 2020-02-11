@@ -254,7 +254,7 @@ const Dashboard = ({ getImages, thumbnails }) => {
           </div>}
 
         <div className="flex center mw8">
-          <div className="image-box w-100 ma2 tc">
+          <div className="image-box w-100 mv2 tc">
             <ImageBox
               imageUrl={imageUrl} 
               imageFile={imageFile}
@@ -281,31 +281,8 @@ const Dashboard = ({ getImages, thumbnails }) => {
                       </div>}
                 </div>}
             </div>
-          
-
         </div>
-
         </>
-
-        // <div className="mw8 center ph0-ns" >
-        //   <div className="image-box fl w-50-ns pr4 pv5" >
-        //       <ImageBox 
-        //         imageUrl={imageUrl} 
-        //         imageFile={imageFile}
-        //         multiBox={multiBox}
-        //         nameData={nameData}
-        //         getIdFromImage={getIdFromImage} />
-             
-        //   </div>
-        //   {(imageUrl || imageFile) && 
-        //   <div className="info-box fl w-50-ns pl4 pv5 fr" >
-        //     {genderData ? <InfoBox 
-        //       genderData={genderData} 
-        //       ageData={ageData} 
-        //       raceData={raceData} /> 
-        //       : <div className="lds-dual-ring"></div>}
-        //   </div>}
-        // </div>
         }
 
     </div>
