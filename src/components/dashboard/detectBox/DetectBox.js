@@ -20,9 +20,9 @@ const DetectBox = ({ onInputChange, onFormSubmit, onFileSubmit }) => {
             placeholder="Add a URL and click detect"
             onChange={onInputChange} />
           <button 
-            className="w50 w-30-ns f5 f4-ns grow link ph3 pv2 dib white bg-orange"
+            className="w50 ma3 w-30-ns f5 f4-ns grow link ph3 pv2 dib white bg-orange"
           >Detect</button>
-          <div className="pt4 center" >
+          {/* <div className="pt4 center" >
             <label className="w50 w-30-ns f5 f4-ns grow ph3 pv2 dib white bg-black-30" htmlFor="file">Browse file</label>
             <input 
               style={{display: "none"}}  
@@ -30,7 +30,7 @@ const DetectBox = ({ onInputChange, onFormSubmit, onFileSubmit }) => {
               type="file" 
               accept="image/png, image/jpeg"  
               onChange={onFileSubmit} />
-          </div>
+          </div> */}
         </form> 
       </div>
     </div>

@@ -6,7 +6,8 @@ import MobileInfoBox from "../mobileInfoBox/MobileInfoBox";
 
 const paddingAdjustment = 15;
 
-const ImageBox = ({ imageUrl, multiBox, imageFile, nameData, getIdFromImage, genderData, ageData, raceData }) => {
+const ImageBox = ({ imageUrl, multiBox, nameData, getIdFromImage, infoState }) => {
+  const { genderData, ageData, raceData } = infoState;
 
   const checkNameValue = (name) => {
     if(name.value > 0 && name.value <= 0.2) return "#ff4136"
@@ -43,12 +44,12 @@ const ImageBox = ({ imageUrl, multiBox, imageFile, nameData, getIdFromImage, gen
         />
       </Breakpoint>
       <div className="image-style">
-      {(imageUrl || imageFile) && 
+      {imageUrl && 
       <img
         className="image-box br3 ba b--white-50 shadow-5"
         onLoad={() => scrollFunc()}
         id="inputImage" alt="" 
-        src={imageUrl || imageFile} 
+        src={imageUrl} 
         width="515px" 
         height="auto" />}
 

@@ -14,11 +14,11 @@ import { connect } from "react-redux";
 import { getImages } from "../../redux/actions/imageActions";
 
 const app = new Clarifai.App({
-  apiKey: "b92149452bda4fc6aa6c01703e637e2f"
+  apiKey: process.env.REACT_APP_KEY
  });
 
 const Dashboard = ({ getImages, thumbnails }) => {
-  const [state, setState] = useState({
+  const [infoState, setInfoState] = useState({
     imageFile: "",
     genderData: "",
     ageData: "",
@@ -38,31 +38,18 @@ const Dashboard = ({ getImages, thumbnails }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // sort face data into separate objects
-  const sortData = (data) => {
-    const faceArr = [];
+  // sort data into seperate objects, either face or name data
+  const sortFunc = (data, type) => {
+    const arr = [];
     data.map(item => {
-      return faceArr.push({
+      return arr.push({
         id: item.id,
         boundingBox: item.region_info.bounding_box,
-        face: item.data.face,
+        ...(type === "face") ? {face: item.data.concepts } : {name: item.data.concepts[0]}
       })
-    }) 
-    setFaceData(faceArr)
-    return faceArr;
-  };
-
-  // sort name data into separate objects
-  const sortNameData = (data) => {
-    const nameArr = []
-    data.map(item => (
-      nameArr.push({
-        id: item.id,
-        boundingBox: item.region_info.bounding_box,
-        name: item.data.concepts[0]
-      })
-    ))
-    return nameArr;
+    })
+    if (type === "face") setFaceData(arr)
+    return arr;
   };
 
   // get bounding box values for multiple faces 
@@ -76,7 +63,6 @@ const Dashboard = ({ getImages, thumbnails }) => {
     setMultibox(boundingBoxArr)
   };
 
-
   // get bounding box values for multiple names 
   const nameBoundingBox = (data, size) => {
     const nameArr = [];
@@ -89,20 +75,18 @@ const Dashboard = ({ getImages, thumbnails }) => {
     setNameData(nameArr)
   };
 
-  // calculate the x,y points for multiple bounding boxes
+  // calculate the x,y points for multiple bounding boxes, for either faces or names
   const calculateFaceLocations = (data, size, nameAdjustment) => {
     const clarifaiFace = data
     let width, height;
-    if(!size) {
+    if (!size) {
       const image = document.getElementById("inputImage");
       width = Number(image.width);
       height = Number(image.height);
-    }
-    if(size) {
+    } else {
       width = Number(size.width);
       height = Number(size.height);
     }
-    
     return {
       leftCol: clarifaiFace.left_col * width,
       topRow: nameAdjustment ? (clarifaiFace.top_row * height - nameAdjustment) : clarifaiFace.top_row * height,
@@ -111,25 +95,26 @@ const Dashboard = ({ getImages, thumbnails }) => {
     }
   };
 
-  // get the face data values for multiple faces
+  // get the face data info for multiple faces
   const getMultiFaceData = (data) => {
-    const genderData = data[0].face.gender_appearance.concepts[0].name
-    const ageData = data[0].face.age_appearance.concepts[0].name
-    const raceData = data[0].face.multicultural_appearance.concepts[0].name
-    const celebrity = data[0].name
-    setState(prevState => ({
+    const ageData = data[0].face.filter(item => item.vocab_id === "age_appearance")[0].name
+    const genderData = data[0].face.filter(item => item.vocab_id === "gender_appearance")[0].name
+    const raceData = data[0].face.filter(item => item.vocab_id === "multicultural_appearance")[0].name
+    setInfoState(prevState => ({
       ...prevState,
       genderData,
       ageData,
-      raceData,
-      celebrity})
+      raceData })
     )
   };
+
+  const [hover, setHover] = useState(null);
 
   // get the id from bounding box click
   const getIdFromImage = (id) => {
     const filteredData = faceData.filter(item => item.id === id)
     getMultiFaceData(filteredData)
+    setHover(true);
   };
 
   // execute on input change
@@ -138,6 +123,7 @@ const Dashboard = ({ getImages, thumbnails }) => {
   };
 
   // execute on form submit
+  // request data from Clarifai API
   const onFormSubmit = (e) => {
     e.preventDefault()
     setErrorMessage("")
@@ -147,8 +133,8 @@ const Dashboard = ({ getImages, thumbnails }) => {
       input)
         .then(response => {
           const responseData = response.results[0].outputs
-          const faceData = sortData(responseData[0].data.regions)
-          const nameData = sortNameData(responseData[1].data.regions)
+          const faceData = sortFunc(responseData[0].data.regions, "face")
+          const nameData = sortFunc(responseData[1].data.regions, "name")
           multiBoundingBox(faceData)
           nameBoundingBox(nameData)
           getMultiFaceData(faceData)
@@ -170,8 +156,7 @@ const Dashboard = ({ getImages, thumbnails }) => {
                 size: {width: size.width, height: size.height},
                 createdAt: new Date()
               })
-              .catch(err => console.log(err))
-              
+              .catch(err => console.log(err))   
          })
         .catch(err => {
           console.log(err)
@@ -180,43 +165,6 @@ const Dashboard = ({ getImages, thumbnails }) => {
         
     e.target.reset()
   };     
-
-  // execute on file submit
-  const onFileSubmit = (e) => {   
-    setErrorMessage("")
-    let img = e.target.files[0]
-    let reader = new FileReader();
-
-    reader.addEventListener("load", () => {
-      setState(prevState => ({
-        ...prevState,
-        imageFile: reader.result
-      }))
-      let imageData = reader.result.split(',')[1];
-      clarifaiFunc(imageData)
-    }, false);
-
-    if (img) {
-      reader.readAsDataURL(img);
-    }
-
-    const clarifaiFunc = (image) => {
-      app.workflow.predict(
-        "my-workflow", 
-        {base64: image})
-        .then(response => {
-          const responseData = response.results[0].outputs
-          const faceData = sortData(responseData[0].data.regions)
-          const nameData = sortNameData(responseData[1].data.regions)
-          multiBoundingBox(faceData)
-          nameBoundingBox(nameData)
-          getMultiFaceData(faceData)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    }
-  };
 
   // get data from saved images 
   const getImageData = (data) => {
@@ -228,17 +176,10 @@ const Dashboard = ({ getImages, thumbnails }) => {
     getMultiFaceData(data.faceData)
   };
 
-  const { imageFile, genderData, ageData, raceData } = state;
-
   return (
     <div className="center" >
-      <DetectBox 
-        onInputChange={onInputChange} 
-        onFormSubmit={onFormSubmit} 
-        onFileSubmit={onFileSubmit} />
-
+      <DetectBox onInputChange={onInputChange} onFormSubmit={onFormSubmit} />
       <Gallery thumbnails={thumbnails} getImageData={getImageData} />
-
 
       {errorMessage 
         ? 
@@ -247,35 +188,28 @@ const Dashboard = ({ getImages, thumbnails }) => {
         </div>
         :
         <>
-        {(imageUrl || imageFile) && 
+        {imageUrl && 
           <div className="title-box" >
             <Confidence />
-            <p>Hover above the box to reveal the name</p>
+            <h4>Hover above the box to reveal the name</h4>
           </div>}
-
+         
         <div className="flex center mw8">
           <div className="image-box w-100 mv2 tc">
             <ImageBox
               imageUrl={imageUrl} 
-              imageFile={imageFile}
               multiBox={multiBox}
               nameData={nameData}
-              genderData={genderData}
-              ageData={ageData} 
-              raceData={raceData}
+              infoState={infoState}
               getIdFromImage={getIdFromImage}/>
           </div>
 
-          
             <div className="info-box w-70-ns w-auto w-auto-m ma2">
-              {(imageUrl || imageFile) &&
+              {(imageUrl) &&
                 <div>
-                  {genderData ? 
+                  {infoState.genderData ? 
                     <Breakpoint customQuery="(min-width: 800px)" >
-                      <InfoBox
-                      genderData={genderData} 
-                      ageData={ageData} 
-                      raceData={raceData} />
+                      <InfoBox infoState={infoState} hover={hover} />
                     </Breakpoint>
                     : <div className="lds-dual-ring">
                       </div>}
@@ -283,12 +217,13 @@ const Dashboard = ({ getImages, thumbnails }) => {
             </div>
         </div>
         </>
-        }
+      }
 
     </div>
     )
 };
 
+// access thumbnails from redux state
 const mapStateToProps = (state) => {
   const isSignedInLocal = JSON.parse(localStorage.getItem("authUser"))
   const isSignedIn = state.auth.isUserSignedIn
@@ -296,7 +231,9 @@ const mapStateToProps = (state) => {
   const removeDuplicates = thumbnails && thumbnails.filter(
     (elem,index,self)=>self.findIndex(t=>(t.imageUrl === elem.imageUrl))===index
   )
-  const filteredThumbnails = removeDuplicates && removeDuplicates.filter(item => item.data.userUid === (isSignedIn || isSignedInLocal.uid))
+  const filteredThumbnails = removeDuplicates && removeDuplicates.filter(item => {
+    return item.data.userUid === (isSignedIn || isSignedInLocal.uid)
+  })
   
   return {
     thumbnails: filteredThumbnails
