@@ -2,8 +2,8 @@ import React from "react";
 import "./InfoBox.css";
 import InfoCard from "./InfoCard";
 
-const InfoBox = ({ genderData, ageData, raceData, errorMessage }) => {
-
+const InfoBox = ({ infoState }) => {
+  const { genderData, ageData, raceData } = infoState;
   
   return (
     <div 
