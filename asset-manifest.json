@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/Face-analysis-app/static/css/main.8cc6663b.chunk.css",
+    "main.js": "/Face-analysis-app/static/js/main.3df17bc5.chunk.js",
+    "main.js.map": "/Face-analysis-app/static/js/main.3df17bc5.chunk.js.map",
+    "runtime-main.js": "/Face-analysis-app/static/js/runtime-main.c860093b.js",
+    "runtime-main.js.map": "/Face-analysis-app/static/js/runtime-main.c860093b.js.map",
+    "static/css/2.6d7c7915.chunk.css": "/Face-analysis-app/static/css/2.6d7c7915.chunk.css",
+    "static/js/2.f21112b1.chunk.js": "/Face-analysis-app/static/js/2.f21112b1.chunk.js",
+    "static/js/2.f21112b1.chunk.js.map": "/Face-analysis-app/static/js/2.f21112b1.chunk.js.map",
+    "index.html": "/Face-analysis-app/index.html",
+    "static/css/2.6d7c7915.chunk.css.map": "/Face-analysis-app/static/css/2.6d7c7915.chunk.css.map",
+    "static/css/main.8cc6663b.chunk.css.map": "/Face-analysis-app/static/css/main.8cc6663b.chunk.css.map",
+    "static/js/2.f21112b1.chunk.js.LICENSE.txt": "/Face-analysis-app/static/js/2.f21112b1.chunk.js.LICENSE.txt",
+    "static/media/africa.8c3fd20d.png": "/Face-analysis-app/static/media/africa.8c3fd20d.png",
+    "static/media/eastAsia.ae0b61a0.png": "/Face-analysis-app/static/media/eastAsia.ae0b61a0.png",
+    "static/media/europe.a2ff5349.png": "/Face-analysis-app/static/media/europe.a2ff5349.png",
+    "static/media/middleEast.70f208d0.png": "/Face-analysis-app/static/media/middleEast.70f208d0.png",
+    "static/media/southAmerica.9526769b.png": "/Face-analysis-app/static/media/southAmerica.9526769b.png",
+    "static/media/southAsia.05db9fc6.png": "/Face-analysis-app/static/media/southAsia.05db9fc6.png",
+    "static/media/southeastAsia.901bdaf1.png": "/Face-analysis-app/static/media/southeastAsia.901bdaf1.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.c860093b.js",
+    "static/css/2.6d7c7915.chunk.css",
+    "static/js/2.f21112b1.chunk.js",
+    "static/css/main.8cc6663b.chunk.css",
+    "static/js/main.3df17bc5.chunk.js"
+  ]
+}
