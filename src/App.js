@@ -1,17 +1,9 @@
-import React, { useEffect } from 'react';
-import './App.css';
+import React from "react";
 import Particles from "react-particles-js";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { BreakpointProvider } from "react-socks";
 
-import Navbar from "./components/layout/navbar/Navbar";
-import SignIn from "./components/auth/SignIn";
-import SignUp from "./components/auth/SignUp";
+import Navbar from "./components/navbar/Navbar";
 import Dashboard from "./components/dashboard/Dashboard";
-import Gallery from "./components/dashboard/gallery/Gallery";
-
-import { connect } from "react-redux";
-import { authCheck } from "./redux/actions/authActions";
+import "./App.css";
 
 const particleOptions = {
   particles: {
@@ -19,47 +11,26 @@ const particleOptions = {
       value: 30,
       density: {
         enable: true,
-        value_area: 200
-      }
+        value_area: 200,
+      },
     },
     shape: {
       stroke: {
         width: 2,
-        color: "#ffff00"
-      }
-    }
-  }
-}
+        color: "#ffff00",
+      },
+    },
+  },
+};
 
-const App = ({ authCheck }) => {
-
-  useEffect(() => {
-    authCheck()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+const App = () => {
   return (
-    <BrowserRouter>
-      <BreakpointProvider>
-        <div className="App">
-          <Navbar />
-          <Particles className="particles" params={particleOptions} />
-          <Switch>
-            <Route path="/" exact component={Dashboard} />
-            <Route path="/signin" component={SignIn} />
-            <Route path="/signup" component={SignUp} />
-            <Route path="/gallery" component={Gallery} />
-          </Switch>
-        </div>
-      </BreakpointProvider>
-    </BrowserRouter>
-    );
+    <div className="App">
+      <Navbar />
+      <Particles className="particles" params={particleOptions} />
+      <Dashboard />
+    </div>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    authCheck: () => dispatch(authCheck())
-  }
-};
-
-export default connect(null, mapDispatchToProps)(App);
+export default App;

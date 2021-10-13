@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const Confidence = () => {
-  return ( 
+  return (
     <div className="cf w-80 pa2 pt0 center">
-      <h3 className="mt0" >Name confidence scale</h3>
+      <h2 className="mt0">Name confidence scale</h2>
       <div className="f7 f6-m f5-ns w-20 fl tc pv2 bg-red br3 black">
         0 - 20%
       </div>
@@ -20,7 +20,7 @@ const Confidence = () => {
         80 - 100%
       </div>
     </div>
-   );
-}
- 
+  );
+};
+
 export default Confidence;

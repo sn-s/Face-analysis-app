@@ -1,83 +1,92 @@
-import React, { useState, useEffect } from "react";
-import  { Breakpoint } from 'react-socks';
+import React, { useState } from "react";
 import Clarifai from "clarifai";
-import "./Dashboard.css";
 
-import DetectBox from "./detectBox/DetectBox";
-import Confidence from "./imageBox/confindence";
-import ImageBox from "./imageBox/ImageBox";
-import InfoBox from "./infoBox/InfoBox";
-import Gallery from "./gallery/Gallery";
+import DetectBox from "../detectBox/DetectBox";
+import Confidence from "../imageBox/confindence";
+import ImageBox from "../imageBox/ImageBox";
+import InfoBox from "../infoBox/InfoBox";
 
-import firebase from "../../config/Config";
-import { connect } from "react-redux";
-import { getImages } from "../../redux/actions/imageActions";
+// const app = new Clarifai.App({
+//   apiKey: process.env.REACT_APP_KEY, ///// Hide env file in github
+// });
 
 const app = new Clarifai.App({
-  apiKey: process.env.REACT_APP_KEY
- });
+  apiKey: "ea2eb8044b704154b2c20b0a10226faa", ///// HIDE .ENV IN GITHUB /////
+});
 
 const Dashboard = ({ getImages, thumbnails }) => {
   const [infoState, setInfoState] = useState({
-    imageFile: "",
+    nameData: "",
     genderData: "",
     ageData: "",
     raceData: "",
   });
   const [input, setInput] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [faceData, setFaceData] = useState("");
-  const [multiBox, setMultibox] = useState("");
-  const [nameData, setNameData] = useState("");
+  const [faceData, setFaceData] = useState([]);
+  const [nameData, setNameData] = useState([]);
+  const [multiBox, setMultibox] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const isSignedIn = JSON.parse(localStorage.getItem("authUser"))
-
-  useEffect(() => {
-    isSignedIn && getImages()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // sort data into seperate objects, either face or name data
   const sortFunc = (data, type) => {
     const arr = [];
-    data.map(item => {
+    data[0].data.regions.forEach((item, index) => {
       return arr.push({
-        id: item.id,
-        boundingBox: item.region_info.bounding_box,
-        ...(type === "face") ? {face: item.data.concepts } : {name: item.data.concepts[0]}
-      })
-    })
-    if (type === "face") setFaceData(arr)
+        id: data[0].data.regions[index].id,
+        boundingBox: data[0].data.regions[index].region_info.bounding_box,
+        ...(type === "face"
+          ? {
+              face: {
+                race: data[2].data.regions[index].data.concepts[0].name,
+                gender: data[3].data.regions[index].data.concepts[0].name,
+                age: data[4].data.regions[index].data.concepts[0].name,
+              },
+            }
+          : {
+              name: data[5].data.regions[index].data.concepts[0].name,
+              value: data[5].data.regions[index].data.concepts[0].value,
+            }),
+      });
+    });
+    if (type === "face") setFaceData(arr);
     return arr;
   };
 
-  // get bounding box values for multiple faces 
+  // get bounding box values for multiple faces
   const multiBoundingBox = (data, size) => {
     const boundingBoxArr = [];
-    data.map(item => {
-      return boundingBoxArr.push(
-        {id: item.id, boundingBox: calculateFaceLocations(item.boundingBox, size)}
-      ) 
-    })
-    setMultibox(boundingBoxArr)
+    data.map((item) => {
+      return boundingBoxArr.push({
+        id: item.id,
+        boundingBox: calculateFaceLocations(item.boundingBox, size),
+      });
+    });
+    setMultibox(boundingBoxArr);
   };
 
-  // get bounding box values for multiple names 
+  // get bounding box values for multiple names
   const nameBoundingBox = (data, size) => {
     const nameArr = [];
     const nameAdjustment = 50;
-    data.map(item => {
-      return nameArr.push(
-        {id: item.id, name: item.name, boundingBox: calculateFaceLocations(item.boundingBox, size, nameAdjustment)}
-      )
-    })
-    setNameData(nameArr)
+    data.map((item) => {
+      return nameArr.push({
+        id: item.id,
+        name: item.name,
+        value: item.value,
+        boundingBox: calculateFaceLocations(
+          item.boundingBox,
+          size,
+          nameAdjustment
+        ),
+      });
+    });
+    setNameData(nameArr);
   };
 
   // calculate the x,y points for multiple bounding boxes, for either faces or names
   const calculateFaceLocations = (data, size, nameAdjustment) => {
-    const clarifaiFace = data
+    const clarifaiFace = data;
     let width, height;
     if (!size) {
       const image = document.getElementById("inputImage");
@@ -89,161 +98,139 @@ const Dashboard = ({ getImages, thumbnails }) => {
     }
     return {
       leftCol: clarifaiFace.left_col * width,
-      topRow: nameAdjustment ? (clarifaiFace.top_row * height - nameAdjustment) : clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottowRow: height - (clarifaiFace.bottom_row * height)
-    }
+      topRow: nameAdjustment
+        ? clarifaiFace.top_row * height - nameAdjustment
+        : clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottowRow: height - clarifaiFace.bottom_row * height,
+    };
   };
 
   // get the face data info for multiple faces
-  const getMultiFaceData = (data) => {
-    const ageData = data[0].face.filter(item => item.vocab_id === "age_appearance")[0].name
-    const genderData = data[0].face.filter(item => item.vocab_id === "gender_appearance")[0].name
-    const raceData = data[0].face.filter(item => item.vocab_id === "multicultural_appearance")[0].name
-    setInfoState(prevState => ({
+  const getMultiFaceData = (data, name) => {
+    const nameData = name ? name[0].name : "";
+    const ageData = data[0].face.age;
+    const genderData = data[0].face.gender;
+    const raceData = data[0].face.race;
+    setInfoState((prevState) => ({
       ...prevState,
+      nameData,
       genderData,
       ageData,
-      raceData })
-    )
+      raceData,
+    }));
   };
 
   const [hover, setHover] = useState(null);
 
   // get the id from bounding box click
   const getIdFromImage = (id) => {
-    const filteredData = faceData.filter(item => item.id === id)
-    getMultiFaceData(filteredData)
+    const filteredData = faceData.filter((item) => item.id === id);
+    const filteredName = nameData.filter((item) => item.id === id);
+    getMultiFaceData(filteredData, filteredName);
     setHover(true);
   };
 
   // execute on input change
   const onInputChange = (e) => {
-    setInput(e.target.value)
+    setInput(e.target.value);
   };
 
   // execute on form submit
   // request data from Clarifai API
-  const onFormSubmit = (e) => {
-    e.preventDefault()
-    setErrorMessage("")
-    setImageUrl(input)
-    app.workflow.predict(
-      "my-workflow", 
-      input)
-        .then(response => {
-          const responseData = response.results[0].outputs
-          const faceData = sortFunc(responseData[0].data.regions, "face")
-          const nameData = sortFunc(responseData[1].data.regions, "name")
-          multiBoundingBox(faceData)
-          nameBoundingBox(nameData)
-          getMultiFaceData(faceData)
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
+    setInfoState({
+      nameData: "",
+      genderData: "",
+      ageData: "",
+      raceData: "",
+    });
+    setFaceData([]);
+    setNameData([]);
+    setMultibox([]);
+    setErrorMessage("");
+    setImageUrl(input);
 
-          return { faceData, nameData };
-         })
-          .then((data) => {
-            const user = isSignedIn && firebase.auth().currentUser.uid;
-            const size = document.getElementById("inputImage")
+    try {
+      const response = await app.workflow.predict("Face-Detector", input);
+      const responseData = response.results[0].outputs;
 
-            isSignedIn && firebase
-              .firestore()
-              .collection("images")
-              .add({
-                userUid: user, 
-                imageUrl: input, 
-                faceData: data.faceData, 
-                nameData: data.nameData,
-                size: {width: size.width, height: size.height},
-                createdAt: new Date()
-              })
-              .catch(err => console.log(err))   
-         })
-        .catch(err => {
-          console.log(err)
-          setErrorMessage("No face was detected")
-        });
-        
-    e.target.reset()
-  };     
+      const faceData = sortFunc(responseData, "face");
+      const nameData = sortFunc(responseData, "name");
+      multiBoundingBox(faceData);
+      nameBoundingBox(nameData);
+      getMultiFaceData(faceData, nameData);
 
-  // get data from saved images 
-  const getImageData = (data) => {
-    setErrorMessage("")
-    setImageUrl(data.imageUrl)
-    setFaceData(data.faceData)
-    multiBoundingBox(data.faceData, data.size)
-    nameBoundingBox(data.nameData, data.size)
-    getMultiFaceData(data.faceData)
+      setInput("");
+    } catch (error) {
+      console.log(error);
+      setErrorMessage("Unable to detect any faces");
+      setInput("");
+    }
   };
 
-  return (
-    <div className="center" >
-      <DetectBox onInputChange={onInputChange} onFormSubmit={onFormSubmit} />
-      <Gallery thumbnails={thumbnails} getImageData={getImageData} />
+  let imageHeight = document.getElementById("inputImage")?.height + 50;
 
-      {errorMessage 
-        ? 
-        <div className="mb7 br3 mv3 ba b--white-50 w-70 shadow-5 center" >
-          <p className="f3 mv5" >{errorMessage}</p>
+  return (
+    <div className="center">
+      <DetectBox
+        input={input}
+        onInputChange={onInputChange}
+        onFormSubmit={onFormSubmit}
+      />
+
+      {errorMessage ? (
+        <div className="mb7 br3 mv3 ba b--white-50 w-70 shadow-5 center">
+          <p className="f3 mv5">{errorMessage}</p>
         </div>
-        :
+      ) : (
         <>
-        {imageUrl && 
-          <div className="title-box" >
-            <Confidence />
-            <h4>Hover above the box to reveal the name</h4>
-          </div>}
-         
-        <div className="flex center mw8">
-          <div className="image-box w-100 mv2 tc">
-            <ImageBox
-              imageUrl={imageUrl} 
-              multiBox={multiBox}
-              nameData={nameData}
-              infoState={infoState}
-              getIdFromImage={getIdFromImage}/>
+          {imageUrl && (
+            <div className="title-box">
+              <Confidence />
+            </div>
+          )}
+
+          <div
+            style={{ height: imageHeight ? imageHeight : "" }}
+            className="center mw7 tc"
+          >
+            <div className="image-box">
+              <ImageBox
+                imageUrl={imageUrl}
+                multiBox={multiBox}
+                nameData={nameData}
+                getIdFromImage={getIdFromImage}
+              />
+            </div>
           </div>
 
-            <div className="info-box w-70-ns w-auto w-auto-m ma2">
-              {(imageUrl) &&
-                <div>
-                  {infoState.genderData ? 
-                    <Breakpoint customQuery="(min-width: 800px)" >
-                      <InfoBox infoState={infoState} hover={hover} />
-                    </Breakpoint>
-                    : <div className="lds-dual-ring">
-                      </div>}
-                </div>}
-            </div>
-        </div>
+          <div
+            style={{ position: "relative", width: "80%", margin: "auto" }}
+            className="info-box"
+          >
+            {imageUrl && (
+              <div>
+                {infoState.genderData ? (
+                  <div>
+                    <h2 className="ma1">Face Analysis Data</h2>
+                    <InfoBox infoState={infoState} hover={hover} />
+                    <p className="mt4">
+                      Icons made by Freepik from www.flaticon.com; Marvdrock and
+                      Ted Grajeda from www.thenounproject.com
+                    </p>
+                  </div>
+                ) : (
+                  <div className="lds-dual-ring"></div>
+                )}
+              </div>
+            )}
+          </div>
         </>
-      }
-
+      )}
     </div>
-    )
+  );
 };
 
-// access thumbnails from redux state
-const mapStateToProps = (state) => {
-  const isSignedInLocal = JSON.parse(localStorage.getItem("authUser"))
-  const isSignedIn = state.auth.isUserSignedIn
-  const thumbnails = state.image.thumbnails
-  const removeDuplicates = thumbnails && thumbnails.filter(
-    (elem,index,self)=>self.findIndex(t=>(t.imageUrl === elem.imageUrl))===index
-  )
-  const filteredThumbnails = removeDuplicates && removeDuplicates.filter(item => {
-    return item.data.userUid === (isSignedIn || isSignedInLocal.uid)
-  })
-  
-  return {
-    thumbnails: filteredThumbnails
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    getImages: () => dispatch(getImages())
-  }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default Dashboard;
